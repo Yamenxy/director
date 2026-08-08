@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="images/27aaa2af-994c-4d8a-8221-c5a3674cbb9b-removebg-preview_logo.png" type="image/png">
+<title>Do You Love Physics?</title>
+<style>
+  :root{
+    --bg1:#0b0f2b;
+    --bg2:#1b1440;
+    --accent:#7dd3fc;
+    --accent2:#a78bfa;
+    --accent3:#f472b6;
+    --glass: rgba(255,255,255,0.06);
+    --glass-border: rgba(255,255,255,0.18);
+  }
+  *{box-sizing:border-box;}
+  body,html{
+    margin:0;padding:0;height:100%;
+    font-family:'Tajawal','Cairo','Segoe UI',Arial,sans-serif;
+    overflow:hidden;
+    background: radial-gradient(circle at 20% 20%, #2d1b69 0%, transparent 45%),
+                radial-gradient(circle at 80% 30%, #0f3460 0%, transparent 45%),
+                radial-gradient(circle at 50% 90%, #4a1d6e 0%, transparent 45%),
+                linear-gradient(135deg, var(--bg1), var(--bg2));
+    color:#fff;
+  }
+
+  /* Orbit animation background */
+  #orbit-field{
+    position:absolute; inset:0; z-index:0; pointer-events:none;
+  }
+  .orbit{
+    position:absolute;
+    border:1px solid rgba(255,255,255,0.07);
+    border-radius:50%;
+    top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    animation: spin linear infinite;
+  }
+  .orbit .electron{
+    position:absolute;
+    width:10px;height:10px;
+    border-radius:50%;
+    top:-5px; left:50%;
+    box-shadow: 0 0 12px 3px currentColor;
+  }
+  @keyframes spin{ from{transform:translate(-50%,-50%) rotate(0deg);} to{transform:translate(-50%,-50%) rotate(360deg);} }
+
+  #particles-js{
+    position:absolute; width:100%; height:100%; z-index:1;
+  }
+
+  /* Floating physics symbols */
+  .float-symbol{
+    position:absolute;
+    font-size:2em;
+    color:rgba(255,255,255,0.10);
+    user-select:none;
+    animation: floatUp linear infinite;
+    z-index:1;
+  }
+  @keyframes floatUp{
+    0%{ transform: translateY(110vh) rotate(0deg); opacity:0; }
+    10%{ opacity:1; }
+    90%{ opacity:1; }
+    100%{ transform: translateY(-10vh) rotate(360deg); opacity:0; }
+  }
+
+  .content{
+    position:relative; z-index:2;
+    text-align:center;
+    padding-top:16vh;
+    min-height:100vh;
+  }
+
+  .badge{
+    display:inline-block;
+    padding:6px 18px;
+    border-radius:30px;
+    background: var(--glass);
+    border:1px solid var(--glass-border);
+    backdrop-filter: blur(6px);
+    font-size:0.9em;
+    letter-spacing:1px;
+    margin-bottom:18px;
+    color: var(--accent);
+  }
+
+  h1{
+    font-size:3em;
+    margin:0 0 10px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    text-shadow: none;
+    animation: hueShift 6s ease-in-out infinite alternate;
+  }
+  @keyframes hueShift{
+    from{ filter:hue-rotate(0deg); }
+    to{ filter:hue-rotate(40deg); }
+  }
+
+  p.sub{
+    color: rgba(255,255,255,0.7);
+    font-size:1.1em;
+    margin-bottom:40px;
+  }
+
+  button{
+    font-size:1.15em;
+    padding:16px 34px;
+    margin:10px;
+    cursor:pointer;
+    background: var(--glass);
+    border:1px solid var(--glass-border);
+    color:#fff;
+    border-radius:50px;
+    backdrop-filter: blur(8px);
+    transition: all 0.35s cubic-bezier(.22,1,.36,1);
+    position:relative;
+    overflow:hidden;
+    font-family:inherit;
+  }
+  button::before{
+    content:"";
+    position:absolute; inset:0;
+    background: linear-gradient(120deg, var(--accent), var(--accent2), var(--accent3));
+    opacity:0;
+    transition: opacity 0.35s ease;
+    z-index:-1;
+  }
+  button:hover{
+    transform: translateY(-4px) scale(1.05);
+    border-color: transparent;
+    box-shadow: 0 10px 30px rgba(124,58,237,0.45);
+  }
+  button:hover::before{ opacity:1; }
+
+  #noButton{
+    position:absolute;
+    transition: all 0.25s ease;
+  }
+
+  #buttons{
+    display:none;
+    animation: fadeIn 0.6s ease forwards;
+  }
+  #buttons h2{
+    font-weight:400;
+    color: rgba(255,255,255,0.75);
+    margin-bottom:24px;
+    font-size:1.2em;
+  }
+  #buttons .grid{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:14px;
+    max-width:820px;
+    margin:0 auto;
+  }
+  #buttons button{
+    flex:1 1 220px;
+    max-width:260px;
+  }
+  @keyframes fadeIn{
+    from{ opacity:0; transform:translateY(20px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  @media (max-width:600px){
+    h1{ font-size:2em; }
+    button{ font-size:1em; padding:14px 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="orbit-field"></div>
+<div id="particles-js"></div>
+
+<div class="content">
+  <div id="question">
+    <div class="badge">DevSphere ⚛ Physics</div>
+    <h1>Do You Love Physics?</h1>
+    <p class="sub">اكتشف عالم الفيزياء بطريقة مختلفة تمامًا</p>
+    <button onclick="showButtons()">Yes 🚀</button>
+    <button id="noButton" onmouseover="moveButton()">No</button>
+  </div>
+
+  <div id="buttons">
+    <h2>اختر صفك الدراسي</h2>
+    <div class="grid">
+      <button onclick="location.href='https://yamenxy.github.io/new_goto/'">الصف الاول الثانوي</button>
+      <button onclick="location.href='https://yamenxy.github.io/new_goto_2/'">الصف الثاني الثانوي</button>
+      <button onclick="location.href='https://yamenxy.github.io/new_goto_3/'">الصف الثالث الثانوي</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script>
+  particlesJS("particles-js", {
+      "particles": {
+          "number": {"value": 70, "density": {"enable": true, "value_area": 900}},
+          "color": {"value": ["#7dd3fc", "#a78bfa", "#f472b6"]},
+          "shape": {"type": "circle", "stroke": {"width": 0, "color": "#000000"}, "polygon": {"nb_sides": 5}},
+          "opacity": {"value": 0.5, "random": true, "anim": {"enable": true, "speed": 0.6, "opacity_min": 0.1, "sync": false}},
+          "size": {"value": 3, "random": true, "anim": {"enable": false, "speed": 40, "size_min": 0.1, "sync": false}},
+          "line_linked": {"enable": true, "distance": 150, "color": "#a78bfa", "opacity": 0.35, "width": 1},
+          "move": {"enable": true, "speed": 3.5, "direction": "none", "random": true, "straight": false, "out_mode": "out", "bounce": false, "attract": {"enable": false, "rotateX": 600, "rotateY": 1200}}
+      },
+      "interactivity": {
+          "detect_on": "canvas",
+          "events": {
+              "onhover": {"enable": true, "mode": "grab"},
+              "onclick": {"enable": true, "mode": "push"},
+              "resize": true
+          },
+          "modes": {
+              "grab": {"distance": 180, "line_linked": {"opacity": 0.6}},
+              "bubble": {"distance": 400, "size": 40, "duration": 2, "opacity": 8, "speed": 3},
+              "repulse": {"distance": 200, "duration": 0.4},
+              "push": {"particles_nb": 4},
+              "remove": {"particles_nb": 2}
+          }
+      },
+      "retina_detect": true
+  });
+
+  // Orbiting "electrons" behind everything
+  (function buildOrbits(){
+    const field = document.getElementById('orbit-field');
+    const colors = ['#7dd3fc', '#a78bfa', '#f472b6'];
+    const sizes = [220, 340, 460];
+    sizes.forEach((size, i) => {
+      const orbit = document.createElement('div');
+      orbit.className = 'orbit';
+      orbit.style.width = size + 'px';
+      orbit.style.height = (size * 0.4) + 'px';
+      orbit.style.animationDuration = (10 + i * 6) + 's';
+      orbit.style.transform += ` rotate(${i * 60}deg)`;
+      const electron = document.createElement('div');
+      electron.className = 'electron';
+      electron.style.color = colors[i % colors.length];
+      electron.style.background = colors[i % colors.length];
+      orbit.appendChild(electron);
+      field.appendChild(orbit);
+    });
+  })();
+
+  // Floating physics symbols
+  (function floatingSymbols(){
+    const symbols = ['⚛', 'E=mc²', 'F=ma', '∑', 'λ', 'π', '⚡', '∞', 'Ω', '⚙'];
+    const container = document.querySelector('.content');
+    for(let i=0;i<14;i++){
+      const el = document.createElement('div');
+      el.className = 'float-symbol';
+      el.textContent = symbols[Math.floor(Math.random()*symbols.length)];
+      el.style.left = Math.random()*100 + 'vw';
+      el.style.animationDuration = (10 + Math.random()*14) + 's';
+      el.style.animationDelay = (Math.random()*10) + 's';
+      el.style.fontSize = (1.2 + Math.random()*1.6) + 'em';
+      document.body.appendChild(el);
+    }
+  })();
+
+  function showButtons() {
+      document.getElementById('question').style.display = 'none';
+      document.getElementById('buttons').style.display = 'block';
+  }
+
+  function moveButton() {
+      var button = document.getElementById('noButton');
+      var x = Math.random() * (window.innerWidth - button.offsetWidth - 40) + 20;
+      var y = Math.random() * (window.innerHeight - button.offsetHeight - 40) + 20;
+      button.style.left = x + 'px';
+      button.style.top = y + 'px';
+  }
+</script>
+</body>
+</html>
