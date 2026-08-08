@@ -17,56 +17,62 @@
   }
   *{box-sizing:border-box;}
   body,html{
-    margin:0;padding:0;height:100%;
+    margin:0;padding:0;min-height:100%;
     font-family:'Tajawal','Cairo','Segoe UI',Arial,sans-serif;
-    overflow:hidden;
     background: radial-gradient(circle at 20% 20%, #2d1b69 0%, transparent 45%),
                 radial-gradient(circle at 80% 30%, #0f3460 0%, transparent 45%),
                 radial-gradient(circle at 50% 90%, #4a1d6e 0%, transparent 45%),
                 linear-gradient(135deg, var(--bg1), var(--bg2));
     color:#fff;
+    overflow-x:hidden;
   }
 
-  /* Orbit animation background */
-  #orbit-field{
-    position:absolute; inset:0; z-index:0; pointer-events:none;
+  /* Cheap twinkling starfield using repeating radial-gradients (no JS, no canvas) */
+  .stars{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      radial-gradient(1.5px 1.5px at 20px 30px, rgba(255,255,255,0.9), transparent),
+      radial-gradient(1.5px 1.5px at 90px 120px, rgba(255,255,255,0.7), transparent),
+      radial-gradient(1px 1px at 160px 60px, rgba(255,255,255,0.6), transparent),
+      radial-gradient(2px 2px at 230px 180px, rgba(255,255,255,0.8), transparent),
+      radial-gradient(1px 1px at 300px 90px, rgba(255,255,255,0.5), transparent);
+    background-repeat: repeat;
+    background-size: 340px 220px;
+    animation: twinkle 4s ease-in-out infinite alternate;
+    opacity:0.7;
   }
-  .orbit{
-    position:absolute;
-    border:1px solid rgba(255,255,255,0.07);
-    border-radius:50%;
+  @keyframes twinkle{ from{opacity:0.4;} to{opacity:0.9;} }
+
+  /* Simple orbiting atom, pure CSS, cheap on GPU */
+  .atom{
+    position:fixed;
     top:50%; left:50%;
-    transform:translate(-50%,-50%);
-    animation: spin linear infinite;
+    width:260px; height:260px;
+    margin:-130px 0 0 -130px;
+    z-index:0;
+    pointer-events:none;
+    opacity:0.35;
   }
-  .orbit .electron{
-    position:absolute;
-    width:10px;height:10px;
+  .atom .ring{
+    position:absolute; inset:0;
+    border:1px solid rgba(255,255,255,0.15);
     border-radius:50%;
-    top:-5px; left:50%;
-    box-shadow: 0 0 12px 3px currentColor;
   }
-  @keyframes spin{ from{transform:translate(-50%,-50%) rotate(0deg);} to{transform:translate(-50%,-50%) rotate(360deg);} }
-
-  #particles-js{
-    position:absolute; width:100%; height:100%; z-index:1;
-  }
-
-  /* Floating physics symbols */
-  .float-symbol{
+  .atom .ring:nth-child(1){ animation: spin 12s linear infinite; }
+  .atom .ring:nth-child(2){ transform: rotate(60deg); animation: spin 16s linear infinite reverse; }
+  .atom .ring:nth-child(3){ transform: rotate(120deg); animation: spin 20s linear infinite; }
+  .atom .ring::after{
+    content:"";
     position:absolute;
-    font-size:2em;
-    color:rgba(255,255,255,0.10);
-    user-select:none;
-    animation: floatUp linear infinite;
-    z-index:1;
+    top:-4px; left:calc(50% - 4px);
+    width:8px; height:8px;
+    border-radius:50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px 2px var(--accent);
   }
-  @keyframes floatUp{
-    0%{ transform: translateY(110vh) rotate(0deg); opacity:0; }
-    10%{ opacity:1; }
-    90%{ opacity:1; }
-    100%{ transform: translateY(-10vh) rotate(360deg); opacity:0; }
-  }
+  .atom .ring:nth-child(2)::after{ background: var(--accent2); box-shadow: 0 0 10px 2px var(--accent2); }
+  .atom .ring:nth-child(3)::after{ background: var(--accent3); box-shadow: 0 0 10px 2px var(--accent3); }
+  @keyframes spin{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
 
   .content{
     position:relative; z-index:2;
@@ -81,7 +87,6 @@
     border-radius:30px;
     background: var(--glass);
     border:1px solid var(--glass-border);
-    backdrop-filter: blur(6px);
     font-size:0.9em;
     letter-spacing:1px;
     margin-bottom:18px;
@@ -95,12 +100,6 @@
     -webkit-background-clip:text;
     background-clip:text;
     color:transparent;
-    text-shadow: none;
-    animation: hueShift 6s ease-in-out infinite alternate;
-  }
-  @keyframes hueShift{
-    from{ filter:hue-rotate(0deg); }
-    to{ filter:hue-rotate(40deg); }
   }
 
   p.sub{
@@ -118,35 +117,25 @@
     border:1px solid var(--glass-border);
     color:#fff;
     border-radius:50px;
-    backdrop-filter: blur(8px);
-    transition: all 0.35s cubic-bezier(.22,1,.36,1);
-    position:relative;
-    overflow:hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
     font-family:inherit;
   }
-  button::before{
-    content:"";
-    position:absolute; inset:0;
-    background: linear-gradient(120deg, var(--accent), var(--accent2), var(--accent3));
-    opacity:0;
-    transition: opacity 0.35s ease;
-    z-index:-1;
-  }
   button:hover{
-    transform: translateY(-4px) scale(1.05);
+    transform: translateY(-3px) scale(1.04);
     border-color: transparent;
-    box-shadow: 0 10px 30px rgba(124,58,237,0.45);
+    background: linear-gradient(120deg, var(--accent), var(--accent2), var(--accent3));
+    box-shadow: 0 10px 25px rgba(124,58,237,0.4);
   }
-  button:hover::before{ opacity:1; }
 
   #noButton{
-    position:absolute;
-    transition: all 0.25s ease;
+    position:relative;
+    transition: transform 0.15s ease;
   }
 
-  #buttons{
-    display:none;
-    animation: fadeIn 0.6s ease forwards;
+  #buttons{ display:none; }
+  #buttons.show{
+    display:block;
+    animation: fadeIn 0.5s ease forwards;
   }
   #buttons h2{
     font-weight:400;
@@ -161,26 +150,32 @@
     gap:14px;
     max-width:820px;
     margin:0 auto;
+    padding:0 16px;
   }
   #buttons button{
     flex:1 1 220px;
     max-width:260px;
   }
   @keyframes fadeIn{
-    from{ opacity:0; transform:translateY(20px); }
+    from{ opacity:0; transform:translateY(15px); }
     to{ opacity:1; transform:translateY(0); }
   }
 
   @media (max-width:600px){
     h1{ font-size:2em; }
     button{ font-size:1em; padding:14px 22px; }
+    .atom{ width:180px; height:180px; margin:-90px 0 0 -90px; }
   }
 </style>
 </head>
 <body>
 
-<div id="orbit-field"></div>
-<div id="particles-js"></div>
+<div class="stars"></div>
+<div class="atom">
+  <div class="ring"></div>
+  <div class="ring"></div>
+  <div class="ring"></div>
+</div>
 
 <div class="content">
   <div id="question">
@@ -201,84 +196,18 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 <script>
-  particlesJS("particles-js", {
-      "particles": {
-          "number": {"value": 70, "density": {"enable": true, "value_area": 900}},
-          "color": {"value": ["#7dd3fc", "#a78bfa", "#f472b6"]},
-          "shape": {"type": "circle", "stroke": {"width": 0, "color": "#000000"}, "polygon": {"nb_sides": 5}},
-          "opacity": {"value": 0.5, "random": true, "anim": {"enable": true, "speed": 0.6, "opacity_min": 0.1, "sync": false}},
-          "size": {"value": 3, "random": true, "anim": {"enable": false, "speed": 40, "size_min": 0.1, "sync": false}},
-          "line_linked": {"enable": true, "distance": 150, "color": "#a78bfa", "opacity": 0.35, "width": 1},
-          "move": {"enable": true, "speed": 3.5, "direction": "none", "random": true, "straight": false, "out_mode": "out", "bounce": false, "attract": {"enable": false, "rotateX": 600, "rotateY": 1200}}
-      },
-      "interactivity": {
-          "detect_on": "canvas",
-          "events": {
-              "onhover": {"enable": true, "mode": "grab"},
-              "onclick": {"enable": true, "mode": "push"},
-              "resize": true
-          },
-          "modes": {
-              "grab": {"distance": 180, "line_linked": {"opacity": 0.6}},
-              "bubble": {"distance": 400, "size": 40, "duration": 2, "opacity": 8, "speed": 3},
-              "repulse": {"distance": 200, "duration": 0.4},
-              "push": {"particles_nb": 4},
-              "remove": {"particles_nb": 2}
-          }
-      },
-      "retina_detect": true
-  });
-
-  // Orbiting "electrons" behind everything
-  (function buildOrbits(){
-    const field = document.getElementById('orbit-field');
-    const colors = ['#7dd3fc', '#a78bfa', '#f472b6'];
-    const sizes = [220, 340, 460];
-    sizes.forEach((size, i) => {
-      const orbit = document.createElement('div');
-      orbit.className = 'orbit';
-      orbit.style.width = size + 'px';
-      orbit.style.height = (size * 0.4) + 'px';
-      orbit.style.animationDuration = (10 + i * 6) + 's';
-      orbit.style.transform += ` rotate(${i * 60}deg)`;
-      const electron = document.createElement('div');
-      electron.className = 'electron';
-      electron.style.color = colors[i % colors.length];
-      electron.style.background = colors[i % colors.length];
-      orbit.appendChild(electron);
-      field.appendChild(orbit);
-    });
-  })();
-
-  // Floating physics symbols
-  (function floatingSymbols(){
-    const symbols = ['⚛', 'E=mc²', 'F=ma', '∑', 'λ', 'π', '⚡', '∞', 'Ω', '⚙'];
-    const container = document.querySelector('.content');
-    for(let i=0;i<14;i++){
-      const el = document.createElement('div');
-      el.className = 'float-symbol';
-      el.textContent = symbols[Math.floor(Math.random()*symbols.length)];
-      el.style.left = Math.random()*100 + 'vw';
-      el.style.animationDuration = (10 + Math.random()*14) + 's';
-      el.style.animationDelay = (Math.random()*10) + 's';
-      el.style.fontSize = (1.2 + Math.random()*1.6) + 'em';
-      document.body.appendChild(el);
-    }
-  })();
-
   function showButtons() {
       document.getElementById('question').style.display = 'none';
-      document.getElementById('buttons').style.display = 'block';
+      document.getElementById('buttons').classList.add('show');
   }
 
   function moveButton() {
       var button = document.getElementById('noButton');
-      var x = Math.random() * (window.innerWidth - button.offsetWidth - 40) + 20;
-      var y = Math.random() * (window.innerHeight - button.offsetHeight - 40) + 20;
-      button.style.left = x + 'px';
-      button.style.top = y + 'px';
+      var maxX = 120, maxY = 60;
+      var x = (Math.random() - 0.5) * maxX;
+      var y = (Math.random() - 0.5) * maxY;
+      button.style.transform = 'translate(' + x + 'px,' + y + 'px)';
   }
 </script>
 </body>
